@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>班级管理系统</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <!-- 配置Tailwind CSS主题 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        accent: '#F59E0B',
+                        danger: '#EF4444',
+                        dark: '#1F2937',
+                        light: '#F3F4F6'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'spin-slow': 'spin 3s linear infinite',
+                        'bounce-slow': 'bounce 2s infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                },
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .transition-all-300 {
+                transition: all 300ms ease-in-out;
+            }
+            .rotate-y-180 {
+                transform: rotateY(180deg);
+            }
+            .perspective-1000 {
+                perspective: 1000px;
+            }
+            .backface-hidden {
+                backface-visibility: hidden;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 min-h-screen flex flex-col">
+    <!-- 导航栏 -->
+    <nav id="main-nav" class="bg-white shadow-md fixed w-full z-50 transition-all duration-300">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <i class="fa fa-graduation-cap text-primary text-2xl"></i>
+                    <span class="font-bold text-xl text-primary">班级管理系统</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#welcome" class="nav-link font-medium hover:text-primary transition-colors">欢迎页面</a>
+                    <a href="#attendance" class="nav-link font-medium hover:text-primary transition-colors">学生签到</a>
+                    <a href="#random-call" class="nav-link font-medium hover:text-primary transition-colors">随机点名</a>
+                    <a href="#seat-layout" class="nav-link font-medium hover:text-primary transition-colors">座位安排</a>
+                    <a href="#random-draw" class="nav-link font-medium hover:text-primary transition-colors">随机抽奖</a>
+                    <a href="#countdown" class="nav-link font-medium hover:text-primary transition-colors">倒计时</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="menu-toggle" class="text-gray-700 hover:text-primary">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="#welcome" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100">欢迎页面</a>
+                <a href="#attendance" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100">学生签到</a>
+                <a href="#random-call" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100">随机点名</a>
+                <a href="#seat-layout" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100">座位安排</a>
+                <a href="#random-draw" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100">随机抽奖</a>
+                <a href="#countdown" class="block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100">倒计时</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main class="flex-grow pt-16">
+        <!-- 欢迎页面 -->
+        <section id="welcome" class="py-16 md:py-24 bg-gradient-to-br from-blue-50 to-indigo-50">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row items-center justify-between">
+                    <div class="md:w-1/2 mb-10 md:mb-0">
+                        <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-dark mb-4 leading-tight">
+                            欢迎使用<br>
+                            <span class="text-primary">班级管理系统</span>
+                        </h1>
+                        <p class="text-lg text-gray-600 mb-8 max-w-lg">
+                            专为班主任设计的智能管理工具，帮助您轻松管理班级事务，提升教学效率。
+                        </p>
+                        <div class="flex flex-wrap gap-4">
+                            <a href="#attendance" class="px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all">
+                                开始使用
+                                <i class="fa fa-arrow-right ml-2"></i>
+                            </a>
+                            <a href="#features" class="px-6 py-3 bg-white text-primary border border-primary rounded-lg font-medium hover:bg-gray-50 transition-all">
+                                了解功能
+                            </a>
+                        </div>
+                    </div>
+                    <div class="md:w-1/2 flex justify-center">
+                        <div class="relative">
+                            <div class="absolute -inset-4 bg-primary/20 rounded-2xl blur-xl opacity-70 animate-pulse-slow"></div>
+                            <div class="relative bg-white p-6 rounded-2xl shadow-xl">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="bg-blue-50 p-4 rounded-xl text-center hover:shadow-md transition-all">
+                                        <i class="fa fa-check-square-o text-primary text-3xl mb-2"></i>
+                                        <p class="font-medium">学生签到</p>
+                                    </div>
+                                    <div class="bg-green-50 p-4 rounded-xl text-center hover:shadow-md transition-all">
+                                        <i class="fa fa-random text-secondary text-3xl mb-2"></i>
+                                        <p class="font-medium">随机点名</p>
+                                    </div>
+                                    <div class="bg-amber-50 p-4 rounded-xl text-center hover:shadow-md transition-all">
+                                        <i class="fa fa-th text-accent text-3xl mb-2"></i>
+                                        <p class="font-medium">座位安排</p>
+                                    </div>
+                                    <div class="bg-purple-50 p-4 rounded-xl text-center hover:shadow-md transition-all">
+                                        <i class="fa fa-gift text-purple-500 text-3xl mb-2"></i>
+                                        <p class="font-medium">随机抽奖</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4 bg-gray-50 p-4 rounded-xl text-center hover:shadow-md transition-all">
+                                    <i class="fa fa-clock-o text-red-500 text-3xl mb-2"></i>
+                                    <p class="font-medium">简易倒计时</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 功能介绍 -->
+        <section id="features" class="py-16 bg-white">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-16">系统功能介绍</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all transform hover:-translate-y-1">
+                        <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                            <i class="fa fa-check-square-o text-primary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">学生签到</h3>
+                        <p class="text-gray-600">支持导入学生名单，轻松管理签到情况，随时导出签到记录，方便统计和分析。</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all transform hover:-translate-y-1">
+                        <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                            <i class="fa fa-random text-secondary text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">随机点名</h3>
+                        <p class="text-gray-600">炫酷的全屏旋转点名功能，增加课堂互动性，激发学生参与度。</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all transform hover:-translate-y-1">
+                        <div class="w-14 h-14 bg-amber-100 rounded-full flex items-center justify-center mb-4">
+                            <i class="fa fa-th text-accent text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">座位安排</h3>
+                        <p class="text-gray-600">灵活的课堂座位布局管理，支持拖拽调整，满足不同教学场景需求。</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all transform hover:-translate-y-1">
+                        <div class="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center mb-4">
+                            <i class="fa fa-gift text-purple-500 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">随机抽奖</h3>
+                        <p class="text-gray-600">随机抽取一位同学，适用于课堂奖励、提问等场景，公平公正。</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all transform hover:-translate-y-1">
+                        <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                            <i class="fa fa-clock-o text-red-500 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">简易倒计时</h3>
+                        <p class="text-gray-600">设计重要日期倒计时，如考试、假期等，帮助师生掌握时间节点。</p>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all transform hover:-translate-y-1">
+                        <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
+                            <i class="fa fa-bar-chart text-indigo-500 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">数据统计</h3>
+                        <p class="text-gray-600">直观展示班级各项数据统计，帮助班主任了解班级整体情况，辅助决策。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 学生签到模块 -->
+        <section id="attendance" class="py-16 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold mb-4">学生签到</h2>
+                    <p class="text-gray-600 max-w-2xl mx-auto">高效管理学生签到情况，支持名单导入与导出，让考勤工作变得轻松简单。</p>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-lg p-6 max-w-5xl mx-auto">
+                    <!-- 导入名单 -->
+                    <div class="mb-8">
+                        <h3 class="text-xl font-bold mb-4">学生名单管理</h3>
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <div class="flex-grow">
+                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer" id="file-drop-area">
+                                    <i class="fa fa-upload text-3xl text-gray-400 mb-2"></i>
+                                    <p class="text-gray-500">拖放Excel/CSV文件到此处，或点击上传</p>
+                                    <input type="file" id="file-input" accept=".xlsx,.xls,.csv" class="hidden">
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <button id="upload-btn" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                                    <i class="fa fa-upload mr-2"></i>上传名单
+                                </button>
+                                <button id="export-btn" class="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary/90 transition-colors">
+                                    <i class="fa fa-download mr-2"></i>导出记录
+                                </button>
+                                <button id="sample-btn" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                                    <i class="fa fa-file-text-o mr-2"></i>下载模板
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 签到管理 -->
+                    <div class="mb-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold">签到管理</h3>
+                            <div class="flex gap-2">
+                                <input type="date" id="attendance-date" class="px-3 py-2 border border-gray-300 rounded-lg">
+                                <button id="start-attendance" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                                    <i class="fa fa-play mr-2"></i>开始签到
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                            <div class="flex justify-between items-center">
+                                <div class="text-lg font-medium">签到状态: <span id="attendance-status" class="text-gray-500">未开始</span></div>
+                                <div id="attendance-timer" class="hidden text-lg font-bold text-primary"></div>
+                            </div>
+                            <div class="flex justify-between mt-2 text-sm text-gray-500">
+                                <div>应到人数: <span id="total-students">0</span></div>
+                                <div>已到人数: <span id="attended-students">0</span></div>
+                                <div>出勤率: <span id="attendance-rate">0%</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 签到记录 -->
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">签到记录</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white border border-gray-200">
+                                <thead>
+                                    <tr class="bg-gray-100">
+                                        <th class="py-3 px-4 border-b text-left">序号</th>
+                                        <th class="py-3 px-4 border-b text-left">姓名</th>
+                                        <th class="py-3 px-4 border-b text-left">学号</th>
+                                        <th class="py-3 px-4 border-b text-left">签到时间</th>
+                                        <th class="py-3 px-4 border-b text-left">状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attendance-table-body">
+                                    <tr class="text-center">
+                                        <td colspan="5" class="py-4 text-gray-500">暂无签到记录</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 随机点名模块 -->
+        <section id="random-call" class="py-16 bg-white">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold mb-4">随机点名</h2>
+                    <p class="text-gray-600 max-w-2xl mx-auto">炫酷的全屏旋转点名功能，增加课堂互动性，让点名变得更加有趣。</p>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-lg p-6 max-w-4xl mx-auto">
+                    <!-- 点名控制面板 -->
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
+                        <div class="flex-grow">
+                            <label for="call-duration" class="block text-sm font-medium text-gray-700 mb-1">旋转时长(秒)</label>
+                            <input type="range" id="call-duration" min="1" max="10" value="3" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                                <span>1s</span>
+                                <span><span id="duration-value">3</span>s</span>
+                                <span>10s</span>
+                            </div>
+                        </div>
+                        <button id="start-call" class="px-8 py-4 bg-primary text-white rounded-lg text-lg font-bold hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                            <i class="fa fa-random mr-2"></i>开始点名
+                        </button>
+                    </div>
+
+                    <!-- 点名结果展示 -->
+                    <div id="call-result" class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 text-center min-h-[200px] flex items-center justify-center">
+                        <div class="text-gray-500 text-lg">点击开始点名按钮开始</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 座位安排模块 -->
+        <section id="seat-layout" class="py-16 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold mb-4">座位安排</h2>
+                    <p class="text-gray-600 max-w-2xl mx-auto">灵活的课堂座位布局管理，支持拖拽调整，满足不同教学场景需求。</p>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-lg p-6 max-w-5xl mx-auto">
+                    <!-- 讲台 -->
+                    <div class="text-center mb-8">
+                        <div class="inline-block bg-gray-200 px-12 py-3 rounded-lg font-medium">讲台</div>
+                    </div>
+
+                    <!-- 座位布局 -->
+                    <div id="seat-container" class="grid grid-cols-6 gap-4 mb-8">
+                        <!-- 座位将通过JavaScript动态生成 -->
+                        <div class="col-span-6 text-center py-12 text-gray-500">
+                            <i class="fa fa-info-circle text-xl mb-2"></i>
+                            <p>请先导入学生名单以生成座位</p>
+                        </div>
+                    </div>
+
+                    <!-- 操作按钮 -->
+                    <div class="flex flex-wrap gap-4 justify-center">
+                        <button id="random-seats" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                            <i class="fa fa-random mr-2"></i>随机排座
+                        </button>
+                        <button id="save-seats" class="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary/90 transition-colors">
+                            <i class="fa fa-save mr-2"></i>保存座位
+                        </button>
+                        <button id="load-seats" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                            <i class="fa fa-load mr-2"></i>加载座位
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 随机抽奖模块 -->
+        <section id="random-draw" class="py-16 bg-white">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold mb-4">随机抽奖</h2>
+                    <p class="text-gray-600 max-w-2xl mx-auto">随机抽取一位同学，适用于课堂奖励、提问等场景，公平公正。</p>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-lg p-6 max-w-4xl mx-auto">
+                    <!-- 抽奖设置 -->
+                    <div class="mb-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold">抽奖设置</h3>
+                            <div class="flex gap-2">
+                                <select id="draw-type" class="px-3 py-2 border border-gray-300 rounded-lg">
+                                    <option value="single">抽取1名同学</option>
+                                    <option value="multiple">抽取多名同学</option>
+                                </select>
+                                <input type="number" id="draw-count" min="1" max="10" value="1" class="px-3 py-2 border border-gray-300 rounded-lg w-20 hidden">
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="exclude-attended" class="mr-2">
+                                <label for="exclude-attended">仅从未签到学生中抽取</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 抽奖结果展示 -->
+                    <div id="draw-result" class="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-8 text-center min-h-[200px] flex items-center justify-center mb-8">
+                        <div class="text-gray-500 text-lg">点击开始抽奖按钮开始</div>
+                    </div>
+
+                    <!-- 抽奖按钮 -->
+                    <div class="text-center">
+                        <button id="start-draw" class="px-8 py-4 bg-accent text-white rounded-lg text-lg font-bold hover:bg-accent/90 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                            <i class="fa fa-gift mr-2"></i>开始抽奖
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 倒计时模块 -->
+        <section id="countdown" class="py-16 bg-gray-50">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold mb-4">简易倒计时</h2>
+                    <p class="text-gray-600 max-w-2xl mx-auto">设计重要日期倒计时，如考试、假期等，帮助师生掌握时间节点。</p>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-lg p-6 max-w-4xl mx-auto">
+                    <!-- 倒计时设置 -->
+                    <div class="mb-8">
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <div class="flex-grow">
+                                <label for="countdown-title" class="block text-sm font-medium text-gray-700 mb-1">倒计时标题</label>
+                                <input type="text" id="countdown-title" placeholder="例如：期末考试" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            </div>
+                            <div class="flex-grow">
+                                <label for="countdown-date" class="block text-sm font-medium text-gray-700 mb-1">目标日期</label>
+                                <input type="datetime-local" id="countdown-date" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                            </div>
+                            <div class="flex items-end">
+                                <button id="set-countdown" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                                    <i class="fa fa-plus mr-2"></i>设置倒计时
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 倒计时展示 -->
+                    <div id="countdown-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                        <!-- 倒计时将通过JavaScript动态生成 -->
+                        <div class="col-span-1 md:col-span-2 bg-gray-50 rounded-xl p-8 text-center">
+                            <i class="fa fa-clock-o text-3xl text-gray-400 mb-2"></i>
+                            <p class="text-gray-500">暂无设置的倒计时</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 数据统计模块 -->
+        <section id="statistics" class="py-16 bg-white">
+            <div class="container mx-auto px-4">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold mb-4">数据统计</h2>
+                    <p class="text-gray-600 max-w-2xl mx-auto">直观展示班级各项数据统计，帮助班主任了解班级整体情况。</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                    <!-- 出勤率统计图表 -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-bold mb-4">出勤率统计</h3>
+                        <div class="h-64">
+                            <canvas id="attendance-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- 签到情况统计 -->
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-bold mb-4">签到情况</h3>
+                        <div class="h-64">
+                            <canvas id="attendance-pie-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 全屏点名遮罩层 -->
+    <div id="fullscreen-call" class="fixed inset-0 bg-black bg-opacity-95 z-50 hidden flex flex-col items-center justify-center">
+        <div class="text-white text-center">
+            <div id="spinning-names" class="text-5xl md:text-8xl font-bold mb-8 transition-all duration-100"></div>
+            <button id="stop-call" class="px-8 py-4 bg-danger text-white rounded-lg text-lg font-bold hover:bg-danger/90 transition-all shadow-lg">
+                <i class="fa fa-stop mr-2"></i>停止点名
+            </button>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="text-center">
+                <div class="flex justify-center items-center space-x-2 mb-4">
+                    <i class="fa fa-graduation-cap text-primary text-2xl"></i>
+                    <span class="font-bold text-xl">班级管理系统</span>
+                </div>
+                <p class="text-gray-400 mb-4">专为班主任设计的智能管理工具</p>
+                <div class="flex justify-center space-x-4">
+                    <a href="#welcome" class="text-gray-400 hover:text-white transition-colors"><i class="fa fa-home"></i></a>
+                    <a href="#attendance" class="text-gray-400 hover:text-white transition-colors"><i class="fa fa-check-square-o"></i></a>
+                    <a href="#random-call" class="text-gray-400 hover:text-white transition-colors"><i class="fa fa-random"></i></a>
+                    <a href="#seat-layout" class="text-gray-400 hover:text-white transition-colors"><i class="fa fa-th"></i></a>
+                    <a href="#random-draw" class="text-gray-400 hover:text-white transition-colors"><i class="fa fa-gift"></i></a>
+                </div>
+                <div class="mt-6 text-sm text-gray-500">© 2023 班级管理系统 版权所有</div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 全局变量
+        let students = [];
+        let attendanceRecords = [];
+        let currentDate = new Date().toISOString().split('T')[0];
+        let isAttendanceActive = false;
+        let countdowns = [];
+        let seatLayout = [];
+        
+        // DOM元素
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mainNav = document.getElementById('main-nav');
+        const fileDropArea = document.getElementById('file-drop-area');
+        const fileInput = document.getElementById('file-input');
+        const uploadBtn = document.getElementById('upload-btn');
+        const exportBtn = document.getElementById('export-btn');
+        const sampleBtn = document.getElementById('sample-btn');
+        const attendanceDate = document.getElementById('attendance-date');
+        const startAttendance = document.getElementById('start-attendance');
+        const attendanceStatus = document.getElementById('attendance-status');
+        const attendanceTimer = document.getElementById('attendance-timer');
+        const totalStudents = document.getElementById('total-students');
+        const attendedStudents = document.getElementById('attended-students');
+        const attendanceRate = document.getElementById('attendance-rate');
+        const attendanceTableBody = document.getElementById('attendance-table-body');
+        const callDuration = document.getElementById('call-duration');
+        const durationValue = document.getElementById('duration-value');
+        const startCall = document.getElementById('start-call');
+        const callResult = document.getElementById('call-result');
+        const fullscreenCall = document.getElementById('fullscreen-call');
+        const spinningNames = document.getElementById('spinning-names');
+        const stopCall = document.getElementById('stop-call');
+        const seatContainer = document.getElementById('seat-container');
+        const randomSeats = document.getElementById('random-seats');
+        const saveSeats = document.getElementById('save-seats');
+        const loadSeats = document.getElementById('load-seats');
+        const drawType = document.getElementById('draw-type');
+        const drawCount = document.getElementById('draw-count');
+        const excludeAttended = document.getElementById('exclude-attended');
+        const startDraw = document.getElementById('start-draw');
+        const drawResult = document.getElementById('draw-result');
+        const countdownTitle = document.getElementById('countdown-title');
+        const countdownDate = document.getElementById('countdown-date');
+        const setCountdown = document.getElementById('set-countdown');
+        const countdownContainer = document.getElementById('countdown-container');
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        // 初始化页面
+        function initPage() {
+            // 设置当前日期
+            attendanceDate.value = currentDate;
+            
+            // 初始化图表
+            initCharts();
+            
+            // 从本地存储加载数据
+            loadFromLocalStorage();
+            
+            // 更新学生总数
+            updateStudentCount();
+            
+            // 渲染签到记录
+            renderAttendanceRecords();
+            
+            // 渲染倒计时
+            renderCountdowns();
+            
+            // 初始化座位
+            initSeats();
+        }
+        
+        // 从本地存储加载数据
+        function loadFromLocalStorage() {
+            const savedStudents = localStorage.getItem('students');
+            const savedAttendanceRecords = localStorage.getItem('attendanceRecords');
+            const savedCountdowns = localStorage.getItem('countdowns');
+            const savedSeatLayout = localStorage.getItem('seatLayout');
+            
+            if (savedStudents) {
+                students = JSON.parse(savedStudents);
+            }
+            
+            if (savedAttendanceRecords) {
+                attendanceRecords = JSON.parse(savedAttendanceRecords);
+            }
+            
+            if (savedCountdowns) {
+                countdowns = JSON.parse(savedCountdowns);
+            }
+            
+            if (savedSeatLayout) {
+                seatLayout = JSON.parse(savedSeatLayout);
+            }
+        }
+        
+        // 保存数据到本地存储
+        function saveToLocalStorage() {
+            localStorage.setItem('students', JSON.stringify(students));
+            localStorage.setItem('attendanceRecords', JSON.stringify(attendanceRecords));
+            localStorage.setItem('countdowns', JSON.stringify(countdowns));
+            localStorage.setItem('seatLayout', JSON.stringify(seatLayout));
+        }
+        
+        // 更新学生总数
+        function updateStudentCount() {
+            totalStudents.textContent = students.length;
+            updateAttendanceStats();
+        }
+        
+        // 更新签到统计
+        function updateAttendanceStats() {
+            const dateRecords = attendanceRecords.filter(record => record.date === currentDate);
+            const attended = dateRecords.filter(record => record.status === '已签到').length;
+            const rate = students.length > 0 ? Math.round((attended / students.length) * 100) : 0;
+            
+            attendedStudents.textContent = attended;
+            attendanceRate.textContent = `${rate}%`;
+        }
+        
+        // 渲染签到记录
+        function renderAttendanceRecords() {
+            attendanceTableBody.innerHTML = '';
+            
+            const dateRecords = attendanceRecords.filter(record => record.date === currentDate);
+            
+            if (dateRecords.length === 0) {
+                attendanceTableBody.innerHTML = `
+                    <tr class="text-center">
+                        <td colspan="5" class="py-4 text-gray-500">暂无签到记录</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            dateRecords.forEach((record, index) => {
+                const row = document.createElement('tr');
+                row.className = record.status === '已签到' ? 'bg-green-50' : 'bg-red-50';
+                row.innerHTML = `
+                    <td class="py-3 px-4 border-b">${index + 1}</td>
+                    <td class="py-3 px-4 border-b">${record.name}</td>
+                    <td class="py-3 px-4 border-b">${record.id}</td>
+                    <td class="py-3 px-4 border-b">${record.time || '-'}</td>
+                    <td class="py-3 px-4 border-b">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${record.status === '已签到' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${record.status}
+                        </span>
+                    </td>
+                `;
+                attendanceTableBody.appendChild(row);
+            });
+        }
+        
+        // 导入学生名单
+        function importStudents(file) {
+            // 简单模拟导入功能
+            // 实际项目中应该使用FileReader和适当的解析库处理Excel/CSV文件
+            const sampleStudents = [
+                { id: '1001', name: '张三' },
+                { id: '1002', name: '李四' },
+                { id: '1003', name: '王五' },
+                { id: '1004', name: '赵六' },
+                { id: '1005', name: '钱七' },
+                { id: '1006', name: '孙八' },
+                { id: '1007', name: '周九' },
+                { id: '1008', name: '吴十' }
+            ];
+            
+            students = sampleStudents;
+            saveToLocalStorage();
+            updateStudentCount();
+            initSeats();
+            
+            // 显示成功消息
+            showNotification('学生名单导入成功！', 'success');
+        }
+        
+        // 导出签到记录
+        function exportAttendanceRecords() {
+            // 简单模拟导出功能
+            // 实际项目中应该生成Excel/CSV文件并提供下载
+            const dateRecords = attendanceRecords.filter(record => record.date === currentDate);
+            
+            if (dateRecords.length === 0) {
+                showNotification('没有可导出的签到记录！', 'error');
+                return;
+            }
+            
+            // 构建CSV内容
+            let csvContent = '序号,姓名,学号,签到时间,状态\n';
+            dateRecords.forEach((record, index) => {
+                csvContent += `${index + 1},${record.name},${record.id},${record.time || '-'},${record.status}\n`;
+            });
+            
+            // 创建Blob和下载链接
+            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `签到记录_${currentDate}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('签到记录导出成功！', 'success');
+        }
+        
+        // 下载模板文件
+        function downloadSampleFile() {
+            // 简单模拟下载模板功能
+            const sampleContent = '学号,姓名\n1001,张三\n1002,李四\n';
+            
+            const blob = new Blob(['\uFEFF' + sampleContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', '学生名单模板.csv');
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        // 开始签到
+        function startAttendanceProcess() {
+            if (students.length === 0) {
+                showNotification('请先导入学生名单！', 'error');
+                return;
+            }
+            
+            isAttendanceActive = true;
+            attendanceStatus.textContent = '进行中';
+            attendanceStatus.className = 'text-green-600';
+            attendanceTimer.classList.remove('hidden');
+            startAttendance.innerHTML = '<i class="fa fa-stop mr-2"></i>结束签到';
+            
+            // 初始化当天的签到记录
+            const dateRecords = attendanceRecords.filter(record => record.date === currentDate);
+            if (dateRecords.length === 0) {
+                students.forEach(student => {
+                    attendanceRecords.push({
+                        date: currentDate,
+                        id: student.id,
+                        name: student.name,
+                        status: '未签到',
+                        time: null
+                    });
+                });
+                saveToLocalStorage();
+                renderAttendanceRecords();
+            }
+            
+            // 启动计时器
+            let seconds = 0;
+            const timerInterval = setInterval(() => {
+                seconds++;
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                attendanceTimer.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+                
+                // 如果签到已结束，清除计时器
+                if (!isAttendanceActive) {
+                    clearInterval(timerInterval);
+                }
+            }, 1000);
+            
+            showNotification('签到已开始！', 'success');
+        }
+        
+        // 结束签到
+        function endAttendanceProcess() {
+            isAttendanceActive = false;
+            attendanceStatus.textContent = '已结束';
+            attendanceStatus.className = 'text-gray-600';
+            startAttendance.innerHTML = '<i class="fa fa-play mr-2"></i>开始签到';
+            
+            showNotification('签到已结束！', 'info');
+        }
+        
+        // 随机点名
+        function performRandomCall() {
+            if (students.length === 0) {
+                showNotification('请先导入学生名单！', 'error');
+                return;
+            }
+            
+            // 显示全屏点名界面
+            fullscreenCall.classList.remove('hidden');
+            
+            // 旋转速度
+            const duration = parseInt(callDuration.value) * 1000;
+            const interval = 50; // 每50毫秒更新一次
+            const iterations = duration / interval;
+            let currentIteration = 0;
+            
+            // 随机选择学生
+            const selectedStudent = students[Math.floor(Math.random() * students.length)];
+            
+            // 开始旋转显示
+            const spinInterval = setInterval(() => {
+                currentIteration++;
+                
+                // 逐渐减速
+                const progress = currentIteration / iterations;
+                const delay = Math.floor(interval * (1 + progress * 2));
+                
+                // 随机显示一个学生名字
+                const randomIndex = Math.floor(Math.random() * students.length);
+                spinningNames.textContent = students[randomIndex].name;
+                
+                // 改变文字大小和颜色以增加视觉效果
+                const scale = 1 + Math.sin(progress * Math.PI) * 0.2;
+                spinningNames.style.transform = `scale(${scale})`;
+                spinningNames.style.color = `hsl(${progress * 360}, 70%, 70%)`;
+                
+                // 结束旋转
+                if (currentIteration >= iterations) {
+                    clearInterval(spinInterval);
+                    spinningNames.textContent = selectedStudent.name;
+                    spinningNames.style.transform = 'scale(1.5)';
+                    spinningNames.style.color = '#3B82F6';
+                    
+                    // 更新点名结果
+                    callResult.innerHTML = `
+                        <div class="text-4xl font-bold text-primary mb-2">${selectedStudent.name}</div>
+                        <div class="text-gray-600">学号: ${selectedStudent.id}</div>
+                    `;
+                }
+            }, interval);
+        }
+        
+        // 初始化座位
+        function initSeats() {
+            if (students.length === 0) {
+                seatContainer.innerHTML = `
+                    <div class="col-span-6 text-center py-12 text-gray-500">
+                        <i class="fa fa-info-circle text-xl mb-2"></i>
+                        <p>请先导入学生名单以生成座位</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 如果没有保存的座位布局，生成默认布局
+            if (seatLayout.length === 0) {
+                generateDefaultSeatLayout();
+            }
+            
+            // 渲染座位
+            renderSeats();
+        }
+        
+        // 生成默认座位布局
+        function generateDefaultSeatLayout() {
+            // 创建与学生对应的座位
+            seatLayout = students.map(student => ({
+                id: student.id,
+                name: student.name,
+                position: null
+            }));
+            
+            // 随机分配位置
+            randomizeSeats();
+        }
+        
+        // 随机排座
+        function randomizeSeats() {
+            // 复制学生数组并打乱顺序
+            const shuffledStudents = [...students].sort(() => Math.random() - 0.5);
+            
+            // 更新座位布局
+            shuffledStudents.forEach((student, index) => {
+                const seatIndex = seatLayout.findIndex(seat => seat.id === student.id);
+                if (seatIndex !== -1) {
+                    seatLayout[seatIndex].position = index;
+                }
+            });
+            
+            // 保存并渲染
+            saveToLocalStorage();
+            renderSeats();
+            
+            showNotification('座位已随机排列！', 'success');
+        }
+        
+        // 渲染座位
+        function renderSeats() {
+            seatContainer.innerHTML = '';
+            
+            // 根据位置排序座位
+            const sortedSeats = [...seatLayout].sort((a, b) => (a.position || 999) - (b.position || 999));
+            
+            // 创建座位元素
+            sortedSeats.forEach((seat, index) => {
+                const seatElement = document.createElement('div');
+                seatElement.className = 'bg-white border border-gray-200 rounded-lg p-3 text-center hover:border-primary transition-all cursor-pointer shadow-sm hover:shadow';
+                seatElement.innerHTML = `
+                    <div class="font-medium">${seat.name}</div>
+                    <div class="text-xs text-gray-500">${seat.id}</div>
+                `;
+                
+                // 添加拖拽功能
+                seatElement.setAttribute('draggable', 'true');
+                seatElement.addEventListener('dragstart', handleDragStart);
+                seatElement.addEventListener('dragover', handleDragOver);
+                seatElement.addEventListener('drop', handleDrop);
+                
+                seatContainer.appendChild(seatElement);
+            });
+        }
+        
+        // 拖拽开始事件
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.querySelector('.font-medium').textContent);
+            e.target.classList.add('opacity-50');
+        }
+        
+        // 拖拽经过事件
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.target.classList.add('border-primary');
+        }
+        
+        // 放置事件
+        function handleDrop(e) {
+            e.preventDefault();
+            
+            const draggedName = e.dataTransfer.getData('text/plain');
+            const targetName = e.target.closest('.text-center').querySelector('.font-medium').textContent;
+            
+            // 交换位置
+            const draggedIndex = seatLayout.findIndex(seat => seat.name === draggedName);
+            const targetIndex = seatLayout.findIndex(seat => seat.name === targetName);
+            
+            if (draggedIndex !== -1 && targetIndex !== -1) {
+                const tempPosition = seatLayout[draggedIndex].position;
+                seatLayout[draggedIndex].position = seatLayout[targetIndex].position;
+                seatLayout[targetIndex].position = tempPosition;
+                
+                // 保存并重新渲染
+                saveToLocalStorage();
+                renderSeats();
+            }
+            
+            // 移除高亮
+            document.querySelectorAll('.border-primary').forEach(el => {
+                el.classList.remove('border-primary');
+            });
+            
+            document.querySelectorAll('.opacity-50').forEach(el => {
+                el.classList.remove('opacity-50');
+            });
+        }
+        
+        // 保存座位布局
+        function saveSeatLayout() {
+            saveToLocalStorage();
+            showNotification('座位布局已保存！', 'success');
+        }
+        
+        // 加载座位布局
+        function loadSeatLayout() {
+            loadFromLocalStorage();
+            renderSeats();
+            showNotification('座位布局已加载！', 'success');
+        }
+        
+        // 随机抽奖
+        function performRandomDraw() {
+            if (students.length === 0) {
+                showNotification('请先导入学生名单！', 'error');
+                return;
+            }
+            
+            // 确定抽取人数
+            const count = drawType.value === 'multiple' ? parseInt(drawCount.value) : 1;
+            
+            // 过滤学生
+            let eligibleStudents = [...students];
+            if (excludeAttended.checked) {
+                const dateRecords = attendanceRecords.filter(record => record.date === currentDate);
+                const attendedIds = dateRecords.filter(record => record.status === '已签到').map(record => record.id);
+                eligibleStudents = eligibleStudents.filter(student => !attendedIds.includes(student.id));
+            }
+            
+            if (eligibleStudents.length === 0) {
+                showNotification('没有符合条件的学生！', 'error');
+                return;
+            }
+            
+            // 随机抽取
+            const selectedStudents = [];
+            const maxCount = Math.min(count, eligibleStudents.length);
+            
+            for (let i = 0; i < maxCount; i++) {
+                const randomIndex = Math.floor(Math.random() * eligibleStudents.length);
+                selectedStudents.push(eligibleStudents[randomIndex]);
+                eligibleStudents.splice(randomIndex, 1);
+            }
+            
+            // 显示结果
+            if (selectedStudents.length === 1) {
+                drawResult.innerHTML = `
+                    <div class="text-4xl font-bold text-accent mb-2">${selectedStudents[0].name}</div>
+                    <div class="text-gray-600">学号: ${selectedStudents[0].id}</div>
+                `;
+            } else {
+                let resultHtml = '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
+                selectedStudents.forEach(student => {
+                    resultHtml += `
+                        <div class="bg-amber-50 p-3 rounded-lg">
+                            <div class="font-bold text-accent">${student.name}</div>
+                            <div class="text-sm text-gray-600">${student.id}</div>
+                        </div>
+                    `;
+                });
+                resultHtml += '</div>';
+                drawResult.innerHTML = resultHtml;
+            }
+            
+            showNotification(`成功抽取了${selectedStudents.length}名同学！`, 'success');
+        }
+        
+        // 设置倒计时
+        function setNewCountdown() {
+            const title = countdownTitle.value.trim();
+            const date = countdownDate.value;
+            
+            if (!title || !date) {
+                showNotification('请填写完整的倒计时信息！', 'error');
+                return;
+            }
+            
+            const targetDate = new Date(date);
+            const now = new Date();
+            
+            if (targetDate <= now) {
+                showNotification('目标日期必须晚于当前时间！', 'error');
+                return;
+            }
+            
+            // 添加新倒计时
+            countdowns.push({
+                id: Date.now(),
+                title,
+                targetDate: targetDate.toISOString()
+            });
+            
+            // 保存并渲染
+            saveToLocalStorage();
+            renderCountdowns();
+            
+            // 清空表单
+            countdownTitle.value = '';
+            countdownDate.value = '';
+            
+            showNotification('倒计时已设置！', 'success');
+        }
+        
+        // 渲染倒计时
+        function renderCountdowns() {
+            countdownContainer.innerHTML = '';
+            
+            if (countdowns.length === 0) {
+                countdownContainer.innerHTML = `
+                    <div class="col-span-1 md:col-span-2 bg-gray-50 rounded-xl p-8 text-center">
+                        <i class="fa fa-clock-o text-3xl text-gray-400 mb-2"></i>
+                        <p class="text-gray-500">暂无设置的倒计时</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            countdowns.forEach(countdown => {
+                const countdownElement = document.createElement('div');
+                countdownElement.className = 'bg-white rounded-xl shadow-md p-6 border border-gray-200';
+                countdownElement.innerHTML = `
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="font-bold text-lg">${countdown.title}</h4>
+                        <button class="delete-countdown text-gray-400 hover:text-danger" data-id="${countdown.id}">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="countdown-timer text-2xl font-bold text-primary" data-target="${countdown.targetDate}"></div>
+                    <div class="text-sm text-gray-500 mt-2">${new Date(countdown.targetDate).toLocaleString('zh-CN')}</div>
+                `;
+                
+                countdownContainer.appendChild(countdownElement);
+            });
+            
+            // 启动倒计时更新
+            updateCountdownTimers();
+        }
+        
+        // 更新倒计时计时器
+        function updateCountdownTimers() {
+            const now = new Date();
+            
+            document.querySelectorAll('.countdown-timer').forEach(timer => {
+                const targetDate = new Date(timer.getAttribute('data-target'));
+                const diff = targetDate - now;
+                
+                if (diff <= 0) {
+                    timer.textContent = '已结束';
+                    timer.className = 'text-xl font-bold text-gray-500';
+                    return;
+                }
+                
+                // 计算剩余时间
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                // 显示剩余时间
+                timer.textContent = `${days}天 ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            });
+            
+            // 每秒更新一次
+            setTimeout(updateCountdownTimers, 1000);
+        }
+        
+        // 删除倒计时
+        function deleteCountdown(id) {
+            countdowns = countdowns.filter(countdown => countdown.id !== parseInt(id));
+            saveToLocalStorage();
+            renderCountdowns();
+            showNotification('倒计时已删除！', 'info');
+        }
+        
+        // 初始化图表
+        function initCharts() {
+            // 出勤率统计图表
+            const attendanceCtx = document.getElementById('attendance-chart').getContext('2d');
+            new Chart(attendanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                    datasets: [{
+                        label: '出勤率',
+                        data: [95, 92, 98, 90, 96, 0, 0],
+                        borderColor: '#3B82F6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 签到情况饼图
+            const pieCtx = document.getElementById('attendance-pie-chart').getContext('2d');
+            new Chart(pieCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['已签到', '未签到'],
+                    datasets: [{
+                        data: [8, 0],
+                        backgroundColor: ['#10B981', '#EF4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%'
+                }
+            });
+        }
+        
+        // 显示通知
+        function showNotification(message, type = 'info') {
+            // 创建通知元素
+            const notification = document.createElement('div');
+            notification.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-y-16 opacity-0`;
+            
+            // 设置样式
+            if (type === 'success') {
+                notification.classList.add('bg-green-500', 'text-white');
+                notification.innerHTML = `<i class="fa fa-check-circle mr-2"></i>${message}`;
+            } else if (type === 'error') {
+                notification.classList.add('bg-red-500', 'text-white');
+                notification.innerHTML = `<i class="fa fa-exclamation-circle mr-2"></i>${message}`;
+            } else {
+                notification.classList.add('bg-blue-500', 'text-white');
+                notification.innerHTML = `<i class="fa fa-info-circle mr-2"></i>${message}`;
+            }
+            
+            // 添加到页面
+            document.body.appendChild(notification);
+            
+            // 显示通知
+            setTimeout(() => {
+                notification.classList.remove('translate-y-16', 'opacity-0');
+            }, 10);
+            
+            // 3秒后隐藏通知
+            setTimeout(() => {
+                notification.classList.add('translate-y-16', 'opacity-0');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+        
+        // 滚动时导航栏样式变化
+        function handleScroll() {
+            if (window.scrollY > 10) {
+                mainNav.classList.add('bg-white/95', 'backdrop-blur-sm');
+            } else {
+                mainNav.classList.remove('bg-white/95', 'backdrop-blur-sm');
+            }
+        }
+        
+        // 平滑滚动到锚点
+        function smoothScrollToAnchor(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            
+            window.scrollTo({
+                top: targetElement.offsetTop - 80,
+                behavior: 'smooth'
+            });
+            
+            // 关闭移动端菜单
+            mobileMenu.classList.add('hidden');
+        }
+        
+        // 事件监听器
+        document.addEventListener('DOMContentLoaded', () => {
+            // 初始化页面
+            initPage();
+            
+            // 移动端菜单切换
+            menuToggle.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // 文件拖放上传
+            fileDropArea.addEventListener('click', () => fileInput.click());
+            fileDropArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileDropArea.classList.add('border-primary');
+            });
+            fileDropArea.addEventListener('dragleave', () => {
+                fileDropArea.classList.remove('border-primary');
+            });
+            fileDropArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileDropArea.classList.remove('border-primary');
+                
+                if (e.dataTransfer.files.length > 0) {
+                    importStudents(e.dataTransfer.files[0]);
+                }
+            });
+            
+            // 文件选择上传
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    importStudents(e.target.files[0]);
+                }
+            });
+            
+            // 上传按钮
+            uploadBtn.addEventListener('click', () => fileInput.click());
+            
+            // 导出按钮
+            exportBtn.addEventListener('click', exportAttendanceRecords);
+            
+            // 下载模板按钮
+            sampleBtn.addEventListener('click', downloadSampleFile);
+            
+            // 日期选择变化
+            attendanceDate.addEventListener('change', () => {
+                currentDate = attendanceDate.value;
+                renderAttendanceRecords();
+                updateAttendanceStats();
+            });
+            
+            // 开始/结束签到
+            startAttendance.addEventListener('click', () => {
+                if (isAttendanceActive) {
+                    endAttendanceProcess();
+                } else {
+                    startAttendanceProcess();
+                }
+            });
+            
+            // 点名时长滑块
+            callDuration.addEventListener('input', () => {
+                durationValue.textContent = callDuration.value;
+            });
+            
+            // 开始点名
+            startCall.addEventListener('click', performRandomCall);
+            
+            // 停止点名
+            stopCall.addEventListener('click', () => {
+                fullscreenCall.classList.add('hidden');
+            });
+            
+            // 随机排座
+            randomSeats.addEventListener('click', randomizeSeats);
+            
+            // 保存座位
+            saveSeats.addEventListener('click', saveSeatLayout);
+            
+            // 加载座位
+            loadSeats.addEventListener('click', loadSeatLayout);
+            
+            // 抽奖类型变化
+            drawType.addEventListener('change', () => {
+                if (drawType.value === 'multiple') {
+                    drawCount.classList.remove('hidden');
+                } else {
+                    drawCount.classList.add('hidden');
+                }
+            });
+            
+            // 开始抽奖
+            startDraw.addEventListener('click', performRandomDraw);
+            
+            // 设置倒计时
+            setCountdown.addEventListener('click', setNewCountdown);
+            
+            // 删除倒计时
+            countdownContainer.addEventListener('click', (e) => {
+                if (e.target.closest('.delete-countdown')) {
+                    const id = e.target.closest('.delete-countdown').getAttribute('data-id');
+                    deleteCountdown(id);
+                }
+            });
+            
+            // 滚动事件
+            window.addEventListener('scroll', handleScroll);
+            
+            // 平滑滚动
+            navLinks.forEach(link => {
+                link.addEventListener('click', smoothScrollToAnchor);
+            });
+            
+            // 移动端菜单项点击
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+                link.addEventListener('click', smoothScrollToAnchor);
+            });
+        });
+    </script>
+</body>
+</html>

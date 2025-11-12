@@ -10,36 +10,45 @@
 
 ## ✨ 核心功能
 
+<img width="1876" height="761" alt="image" src="https://github.com/user-attachments/assets/da82a301-6d87-440a-a176-1a1a63f2456d" />
+<img width="1820" height="666" alt="image" src="https://github.com/user-attachments/assets/1db1858a-70de-4ea1-81fe-ce2b9005a55e" />
+
 ### 1. 欢迎页面
 - 系统介绍和功能概览
 - 直观的用户界面引导
+<img width="1910" height="880" alt="image" src="https://github.com/user-attachments/assets/0e86c427-99ab-400e-a60a-d3deb5cafb14" />
 
 ### 2. 学生签到
 - 支持导入学生名单（Excel/CSV格式）
 - 签到状态实时管理和监控
 - 签到记录导出功能
 - 出勤率统计和展示
+<img width="1865" height="795" alt="image" src="https://github.com/user-attachments/assets/546757bf-896f-4d84-8d10-70124bbd8277" />
 
 ### 3. 随机点名
 - 炫酷的全屏旋转点名效果
 - 可调节旋转时长
 - 随机公平选择学生
+<img width="1865" height="761" alt="image" src="https://github.com/user-attachments/assets/f9f5401b-6179-4f6f-b37a-e66fceb486ef" />
 
 ### 4. 座位安排
 - 灵活的课堂座位布局管理
 - 支持拖拽调整座位
 - 随机排座功能
 - 座位布局保存和加载
+<img width="1863" height="714" alt="image" src="https://github.com/user-attachments/assets/1b2c0cb4-1c3a-4bdf-9182-bbee3f07c2b9" />
 
 ### 5. 随机抽奖
 - 随机抽取一名或多名学生
 - 支持筛选未签到学生
 - 适用于课堂奖励、提问等场景
+<img width="1860" height="780" alt="image" src="https://github.com/user-attachments/assets/fc30ecc3-eaba-4e2c-bd1e-ca9e90112853" />
 
 ### 6. 简易倒计时
 - 自定义重要日期倒计时
 - 实时显示剩余时间
 - 多倒计时管理
+<img width="1885" height="710" alt="image" src="https://github.com/user-attachments/assets/f03b3185-6d56-46ec-b981-7a1882828cc7" />
 
 ## 🛠️ 技术栈
 
